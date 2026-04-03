@@ -1,0 +1,82 @@
+{
+    "_comment": "DO NOT EDIT: FILE GENERATED AUTOMATICALLY BY PTERODACTYL PANEL - PTERODACTYL.IO",
+    "meta": {
+        "version": "PTDL_v2",
+        "update_url": null
+    },
+    "exported_at": "2026-04-03T00:00:00+00:00",
+    "name": "Dr. Robotnik's Ring Racers",
+    "author": "your@email.com",
+    "description": "Dr. Robotnik's Ring Racers (v2.4) dedicated server using a custom Pterodactyl-compatible Docker image. Game binary and all data files are baked into the image.\n\nIncludes a built-in nginx file server for automatic mod downloads. Place addons in the addons/ subdirectories (chars/, tracks/, loadfirst/, loadlast/). Mods are loaded automatically in the correct order by the entrypoint script.\n\nRequires two port allocations: one for the game (UDP) and one for the mod file server (TCP).",
+    "features": null,
+    "docker_images": {
+        "Ring Racers (Pterodactyl Compatible)": "docker.io/trishjoushi/ringracers-ptero:latest"
+    },
+    "file_denylist": [],
+    "startup": "ringracers -dedicated -port {{SERVER_PORT}} +maxplayers {{MAX_PLAYERS}} +servername \"{{SERVER_NAME}}\" {{EXTRA_PARAMS}}",
+    "config": {
+        "files": "{}",
+        "startup": "{\"done\": \"Dedicated server started\"}",
+        "logs": "{}",
+        "stop": "quit"
+    },
+    "scripts": {
+        "installation": {
+            "script": "#!/bin/bash\nset -e\n\nmkdir -p /mnt/server/.ringracers\nmkdir -p /mnt/server/addons/chars\nmkdir -p /mnt/server/addons/tracks\nmkdir -p /mnt/server/addons/loadfirst\nmkdir -p /mnt/server/addons/loadlast\n\nif [ ! -f /mnt/server/ringserv.cfg ]; then\n    cat > /mnt/server/ringserv.cfg << 'EOF'\n// Ring Racers Server Configuration\n// Loaded automatically on server start.\n\n// Register on the public master server list (0 = private, 1 = public)\nmasterserver 0\n\n// Set your contact address so Master Server staff can reach you if needed\n// server_contact \"your@email.com\"\n\n// http_source is managed automatically by the startup script.\n// Set the HTTP_SOURCE variable in the Pterodactyl startup tab.\nEOF\nfi\n\necho \"Installation complete!\"",
+            "container": "ghcr.io/pterodactyl/installers:debian",
+            "entrypoint": "bash"
+        }
+    },
+    "variables": [
+        {
+            "name": "Server Name",
+            "description": "The name of your Ring Racers server as it appears in the server browser and in-game.",
+            "env_variable": "SERVER_NAME",
+            "default_value": "My Ring Racers Server",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "required|string|max:255",
+            "field_type": "text"
+        },
+        {
+            "name": "Max Players",
+            "description": "Maximum number of players allowed on the server (2-16). Ring Racers plays best with 8 or fewer players.",
+            "env_variable": "MAX_PLAYERS",
+            "default_value": "8",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "required|integer|between:2,16",
+            "field_type": "text"
+        },
+        {
+            "name": "HTTP Port",
+            "description": "Port for the built-in mod file server. Must be a second port allocated to this server in Pterodactyl. Players' clients will download mods from this port via the HTTP_SOURCE URL.",
+            "env_variable": "HTTP_PORT",
+            "default_value": "8080",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "required|integer",
+            "field_type": "text"
+        },
+        {
+            "name": "HTTP Source URL",
+            "description": "Public URL where clients download mods from. Should point to your reverse proxy or public IP exposing the mod file server, e.g. http://rr.yourdomain.com/repo. Leave blank to disable automatic mod downloads.",
+            "env_variable": "HTTP_SOURCE",
+            "default_value": "",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "nullable|string|max:255",
+            "field_type": "text"
+        },
+        {
+            "name": "Extra Launch Parameters",
+            "description": "Optional additional arguments passed to ringracers at startup. Examples: +kartspeed 1, +map MAP01, +password mypassword",
+            "env_variable": "EXTRA_PARAMS",
+            "default_value": "",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "nullable|string|max:512",
+            "field_type": "text"
+        }
+    ]
+}
