@@ -4,12 +4,6 @@ A fully self-contained [Pterodactyl](https://pterodactyl.io) egg and Docker imag
 
 ---
 
-## Disclaimer
-
-This image and its accompanying Pterodactyl egg were developed with the assistance of **Claude** (Anthropic AI). While tested and functional, please review the Dockerfile and egg configuration before deploying in a production environment.
-
----
-
 ## Features
 
 - **Zero setup** — game binary and all data files are compiled and baked into the image at build time. No manual downloads required on install.
